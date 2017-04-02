@@ -1,4 +1,5 @@
 package it.polimi.ingsw.tris;
+import it.polimi.ingsw.exceptions.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,7 +8,7 @@ public class Board {
 	private Map<Position, Player> map = new HashMap<>();
 	private static final int DIM = 3;
 
-	public void add(Position position, Player player) throws IndexOutOfBoundsException {
+	public void add(Position position, Player player) throws IndexOutOfBoundsException, PositionNotAvailable {
 		validatePosition(position);
 
 		map.put(position, player);
@@ -15,11 +16,14 @@ public class Board {
 		checkWinner(position, player);
 	}
 
-	private void validatePosition(Position position) throws IndexOutOfBoundsException {
+	private void validatePosition(Position position) throws IndexOutOfBoundsException, PositionNotAvailable {
 		boolean invalidCol = position.getCol() < 0 || position.getCol() >= DIM;
 		boolean invalidRow = position.getRow() < 0 || position.getRow() >= DIM;
 		if (invalidCol || invalidRow)
 			throw new IndexOutOfBoundsException();
+		
+		if(getPlayerInPosition(position.getRow(), position.getCol()) != null)
+			throw new PositionNotAvailable();
 	}
 
 	public boolean checkWinner(Position position, Player player) {
@@ -119,8 +123,4 @@ public class Board {
 	public int getDim() {
 		return DIM;
 	}
-
-	public static class OutOfBoundsException extends Exception {
-	}
-
 }

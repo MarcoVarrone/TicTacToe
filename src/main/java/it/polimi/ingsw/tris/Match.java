@@ -1,11 +1,12 @@
 package it.polimi.ingsw.tris;
+import it.polimi.ingsw.exceptions.*;
 
 import java.util.Random;
 import java.util.Scanner;
 
 public class Match {
 	
-	private static Player player1, player2, turn;
+	private static Player player1, player2, currentPlayer;
 	private static Board board;
 	private static Scanner scanner;
 	
@@ -20,7 +21,7 @@ public class Match {
 		scanner.close();
 	}
 	
-	private static void initializePlayers() {
+	public static void initializePlayers() {
 		System.out.println("Insert the name of the first player");
 		
 		String name1 = scanner.nextLine();
@@ -50,20 +51,20 @@ public class Match {
 			return 'X';
 	}
 	
-	private static void startMatch() {
+	public static void startMatch() {
 		// Select random player to start
 		if(new Random().nextInt(2) == 1)
-			turn = player1;
+			currentPlayer = player1;
 		else
-			turn = player2;
+			currentPlayer = player2;
 		
-		System.out.println(turn.getName() + " starts");
+		System.out.println(currentPlayer.getName() + " starts");
 		
 		board = new Board();
 			
 	}
 	
-	private static void executeMatch() {
+	public static void executeMatch() {
 		while(!board.isFull()) {
 			Position position;
 			while(true) {
@@ -76,33 +77,31 @@ public class Match {
 				position = new Position(row, col);
 				
 				try {
-					board.add(position, turn);
+					board.add(position, currentPlayer);
 					break;
 				} catch (IndexOutOfBoundsException e) {
 					System.err.println("A row or a column exceeds the size of the board");
 					continue;
+				} catch (PositionNotAvailable e) {
+					System.err.println("There is already a symbol in this position");
+					continue;
 				}
-				
-				
 			}
 			
-			
-			
-			if(board.checkWinner(position, turn)) {
+			if(board.checkWinner(position, currentPlayer)) {
 				board.printStatus();
-				System.out.println("Player " + turn.getName() + " wins!");
+				System.out.println("Player " + currentPlayer.getName() + " wins!");
 				break;
 			}
 			
-			if(turn == player1)
-				turn = player2;
+			if(currentPlayer == player1)
+				currentPlayer = player2;
 			else
-				turn = player1;
+				currentPlayer = player1;
 			
 			System.out.println("");
-			System.out.println(turn.getName() + "'s turn:");
+			System.out.println(currentPlayer.getName() + "'s turn:");
 			board.printStatus();
 		}
 	}
-
 }
